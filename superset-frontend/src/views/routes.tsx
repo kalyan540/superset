@@ -140,7 +140,7 @@ export const routes: Routes = [
     Component: DashboardList,
   },
   {
-    path: '/dashboard/:idOrSlug/',
+    path: '/superset/dashboard/:idOrSlug/',
     Component: Dashboard,
   },
   {

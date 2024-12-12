@@ -847,7 +847,7 @@ class Superset(BaseSupersetView):
         if not value:
             return json_error_response(_("permalink state not found"), status=404)
         dashboard_id, state = value["dashboardId"], value.get("state", {})
-        url = f"/dashboard/{dashboard_id}?permalink_key={key}"
+        url = f"/superset/dashboard/{dashboard_id}?permalink_key={key}"
         if url_params := state.get("urlParams"):
             params = parse.urlencode(url_params)
             url = f"{url}&{params}"

@@ -49,7 +49,7 @@ const DEFAULT_PAGE_SIZE = 25;
 
 const getLinkProps = (dashboard: ChartLinkedDashboard) => ({
   key: dashboard.id,
-  to: `/dashboard/${dashboard.id}`,
+  to: `/superset/dashboard/${dashboard.id}`,
   target: '_blank',
   rel: 'noreferer noopener',
   children: dashboard.dashboard_title,
