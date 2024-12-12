@@ -184,12 +184,12 @@ class Dashboard(AuditMixinNullable, ImportExportMixin, Model):
 
     @property
     def url(self) -> str:
-        return f"/superset/dashboard/{self.slug or self.id}/"
+        return f"/dashboard/{self.slug or self.id}/"
 
     @staticmethod
     def get_url(id_: int, slug: str | None = None) -> str:
         # To be able to generate URL's without instantiating a Dashboard object
-        return f"/superset/dashboard/{slug or id_}/"
+        return f"/dashboard/{slug or id_}/"
 
     @property
     def datasources(self) -> set[BaseDatasource]:

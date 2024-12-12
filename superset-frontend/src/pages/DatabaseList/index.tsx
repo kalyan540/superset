@@ -630,7 +630,7 @@ function DatabaseList({
                         ) => (
                           <li key={result.id}>
                             <a
-                              href={`/superset/dashboard/${result.id}`}
+                              href={`/dashboard/${result.id}`}
                               target="_atRiskItem"
                             >
                               {result.title}

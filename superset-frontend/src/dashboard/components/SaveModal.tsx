@@ -154,7 +154,7 @@ class SaveModal extends PureComponent<SaveModalProps, SaveModalState> {
     } else {
       this.onSave(data, dashboardId, saveType).then((resp: JsonResponse) => {
         if (saveType === SAVE_TYPE_NEWDASHBOARD && resp.json?.result?.id) {
-          window.location.href = `/superset/dashboard/${resp.json.result.id}/`;
+          window.location.href = `/dashboard/${resp.json.result.id}/`;
         }
       });
       this.modal?.current?.close?.();

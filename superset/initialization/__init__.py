@@ -21,10 +21,14 @@ import logging
 import os
 import sys
 from typing import Any, Callable, TYPE_CHECKING
+import requests
+import psycopg2
+
+
 
 import wtforms_json
 from deprecation import deprecated
-from flask import Flask, redirect
+from flask import Flask, redirect, jsonify, request
 from flask_appbuilder import expose, IndexView
 from flask_babel import gettext as __
 from flask_compress import Compress
@@ -701,3 +705,61 @@ class SupersetIndexView(IndexView):
     @expose("/")
     def index(self) -> FlaskResponse:
         return redirect("/superset/welcome/")
+    
+    @expose("/api/dataset/update", methods=["POST"])
+    def update_dataset(self) -> FlaskResponse:
+        try:
+            # Extract data from the request body
+            body = request.get_json()
+            database = body.get('database', '')
+            table_name = body.get('table_name', '')
+            rows = body.get('formData', [])
+
+            db_config = {
+                "dbname": database,
+                "user": "superset",
+                "password": "superset",
+                "host": "db",  # Your PostgreSQL host
+                "port": "5432"
+            }
+
+            if not database or not table_name:
+                return jsonify({'error': 'Missing database or table_name in the request body'}), 400
+
+            if not rows or not isinstance(rows, list) or not isinstance(rows[0], dict):
+                return jsonify({'error': 'Invalid formData. Expected a list of dictionaries.'}), 400
+
+            conn = psycopg2.connect(**db_config)
+            cur = conn.cursor()
+
+            # Grant necessary permissions to the user 'admin'
+            grant_permissions_query = f"""GRANT SELECT ON TABLE {database}.public.{table_name} TO PUBLIC;"""
+            cur.execute(grant_permissions_query)
+
+            # Extract column names from the first row's keys
+            columns = list(rows[0].keys())
+
+            # Insert each row
+            for entry in rows:
+                # Prepare the insert query
+                insert_query = f"""INSERT INTO {table_name} ({", ".join([f'"{col}"' for col in columns])}) 
+                                VALUES ({", ".join(['%s' for _ in columns])});"""
+                # Get the values from the dictionary in the order of the columns
+                values = tuple(entry[col] for col in columns)
+                cur.execute(insert_query, values)
+
+            conn.commit()
+            cur.close()
+            conn.close()
+
+            # For testing: log rows
+            for row in rows:
+                logger.info(f"Row inserted: {row}")
+
+            return jsonify({
+                'message': f'Successfully inserted {len(rows)} row(s)'
+            }), 200
+
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            return jsonify({'error': str(e)}), 500

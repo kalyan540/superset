@@ -403,7 +403,7 @@ export function saveDashboardRequest(data, id, saveType) {
       window.history.pushState(
         { event: 'dashboard_properties_changed' },
         '',
-        `/superset/dashboard/${slug || id}/`,
+        `/dashboard/${slug || id}/`,
       );
 
       dispatch(addSuccessToast(t('This dashboard was saved successfully.')));
